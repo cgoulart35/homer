@@ -2,7 +2,7 @@
 # Homepage configuration
 # See https://fontawesome.com/v5/search for icons options
 
-title: "Welcome My Homepage!"
+title: "My Homepage"
 subtitle: "StormerG"
 logo: "assets/personal/StormerG.png"
 # icon: "fas fa-skull-crossbones" # Optional icon
@@ -51,7 +51,7 @@ colors:
 # Optional navbar
 # links: [] # Allows for navbar (dark mode, layout, and search) without any links
 links:
-  - name: "Join my Discord server"
+  - name: "Join my Discord!"
     icon: "fab fa-discord"
     url: "https://discord.gg/TBMqZzqXGT"
     target: "_blank" # optional html a tag target attribute
@@ -70,7 +70,7 @@ services:
         url: "https://gbot.stormerg.com/"
       - name: "The Long Night"
         logo: "assets/personal/Halloween.png"
-        subtitle: "A QR code Halloween game to fight for points!"
+        subtitle: "A QR code Halloween game!"
         tag: "app"
         url: "https://halloween.stormerg.com/"
   - name: "Interesting Links"
@@ -83,6 +83,6 @@ services:
         url: "https://gbot.stormerg.com/"
       - name: "Support my Patreon"
         logo: "assets/personal/Patreon.png"
-        subtitle: "Subscribe to GBot or other ongoing projects!"
+        subtitle: "Subscribe to GBot or other projects!"
         tag: "link"
         url: "https://halloween.stormerg.com/"
