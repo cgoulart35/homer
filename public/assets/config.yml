@@ -51,7 +51,7 @@ colors:
 # Optional navbar
 # links: [] # Allows for navbar (dark mode, layout, and search) without any links
 links:
-  - name: "Join my Discord!"
+  - name: "Join my Discord for gaming!"
     icon: "fab fa-discord"
     url: "https://discord.gg/TBMqZzqXGT"
     target: "_blank" # optional html a tag target attribute
@@ -66,13 +66,29 @@ services:
       - name: "GBot"
         logo: "assets/personal/GBot.jpg"
         subtitle: "A Dockerized Python Discord bot, for fun!"
-        tag: "app"
+        tag: "discord-bot"
         url: "https://gbot.stormerg.com/"
       - name: "The Long Night"
         logo: "assets/personal/Halloween.png"
         subtitle: "A QR code Halloween game!"
-        tag: "app"
+        tag: "web-game"
         url: "https://halloween.stormerg.com/"
+      - name: "quick-itzg-minecraft-bds-deployments"
+        icon: "fa-solid fa-gamepad"
+        subtitle: "Quickly deploy itzg's Minecraft BDS on Linux!"
+        tag: "tool"
+        url: "https://github.com/cgoulart35/quick-itzg-minecraft-bds-deployments"
+      - name: "YouTube-Python-Tool"
+        icon: "fab fa-youtube youtube-icon"
+        subtitle: "Problem solving; YouTube automation!"
+        tag: "tool"
+        url: "https://github.com/cgoulart35/YouTube-Python-Tool"
+      - name: "StormerESP32"
+        icon: "fas fa-wifi"
+        subtitle: "Arduino Nano ESP32 IOT fun!"
+        tag: "iot"
+        url: "https://github.com/cgoulart35/StormerESP32"
+
   - name: "Interesting Links"
     icon: "fas fa-code"
     items:
