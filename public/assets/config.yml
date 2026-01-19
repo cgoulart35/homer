@@ -53,7 +53,7 @@ colors:
 links:
   - name: "Join my Discord for gaming!"
     icon: "fab fa-discord"
-    url: "https://discord.gg/TBMqZzqXGT"
+    url: "https://discord.stormerg.com"
     target: "_blank" # optional html a tag target attribute
 
 # Services
@@ -102,6 +102,11 @@ services:
         subtitle: "Want to contribute? Please reach out!"
         tag: "link"
         url: "https://github.com/cgoulart35"
+      - name: "My Venmo"
+        icon: "fa-solid fa-money-bill-transfer"
+        subtitle: "Buy me a coffee!"
+        tag: "link"
+        url: "https://venmo.stormerg.com"
       - name: "Support my Patreon"
         logo: "assets/personal/Patreon.png"
         subtitle: "Subscribe to GBot or other projects!"
