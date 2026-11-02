@@ -1,57 +1,25 @@
 <template>
-  <Generic :item="item">
-    <template #content>
-      <p class="title is-4">{{ item.name }}</p>
-      <p class="subtitle is-6">
-        <span v-if="error" class="error">An error has occurred.</span>
-        <template v-else>
-          <span class="down">
-            <i class="fas fa-download"></i> {{ downRate }}
-          </span>
-          <span class="up"> <i class="fas fa-upload"></i> {{ upRate }} </span>
-        </template>
-      </p>
-    </template>
-    <template #indicator>
-      <span v-if="!error" class="count"
-        >{{ count }}
-        <template v-if="count === 1">torrent</template>
-        <template v-else>torrents</template>
+  <Generic :item="item" :badges="badges">
+    <template #subtitle>
+      <span class="is-family-monospace mr-3">
+        <i class="fas fa-download"></i> {{ downRate }}
+      </span>
+      <span class="is-family-monospace">
+        <i class="fas fa-upload"></i> {{ upRate }}
       </span>
     </template>
   </Generic>
 </template>
 
 <script>
-import Generic from "./Generic.vue";
-
-// Units to add to download and upload rates.
-const units = ["B", "kiB", "MiB", "GiB"];
-
-// Take the rate in bytes and keep dividing it by 1k until the lowest
-// value for which we have a unit is determined. Return the value with
-// up to two decimals as a string and unit/s appended.
-const displayRate = (rate) => {
-  let i = 0;
-
-  while (rate > 1000 && i < units.length) {
-    rate /= 1000;
-    i++;
-  }
-
-  return (
-    Intl.NumberFormat(undefined, { maximumFractionDigits: 2 }).format(
-      rate || 0,
-    ) + ` ${units[i]}/s`
-  );
-};
+import service from "@/mixins/service.js";
+import { displayRate } from "@/utils/format.js";
 
 export default {
-  name: "rTorrent",
-  props: { item: Object },
-  components: { Generic },
+  name: "RTorrent",
+  mixins: [service],
   // Properties for download, upload, torrent count and errors.
-  data: () => ({ dl: null, ul: null, count: null, error: null }),
+  data: () => ({ dl: null, ul: null, count: null, serverError: null }),
   // Computed properties for the rate labels.
   computed: {
     downRate: function () {
@@ -60,42 +28,30 @@ export default {
     upRate: function () {
       return displayRate(this.ul);
     },
-  },
-  created() {
-    // Set intervals if configured so the rates and/or torrent count
-    // will be updated.
-    const rateInterval = parseInt(this.item.rateInterval, 10) || 0;
-    const torrentInterval = parseInt(this.item.torrentInterval, 10) || 0;
-
-    if (rateInterval > 0) {
-      setInterval(() => this.fetchRates(), rateInterval);
-    }
-
-    if (torrentInterval > 0) {
-      setInterval(() => this.fetchCount(), torrentInterval);
-    }
-
-    // Fetch the initial values.
-    this.fetchRates();
-    this.fetchCount();
+    badges: function () {
+      return [
+        {
+          key: "torrents",
+          label: "Torrents",
+          value: this.count,
+          tone: "neutral",
+          cap: false,
+        },
+        this.connectionBadge(),
+      ];
+    },
   },
   methods: {
-    // Perform two calls to the XML-RPC service and fetch download
-    // and upload rates. Values are saved to the `ul` and `dl`
-    // properties.
-    fetchRates: async function () {
-      this.getRate("throttle.global_up.rate")
-        .then((ul) => (this.ul = ul))
-        .catch(() => (this.error = true));
+    fetchData: function () {
+      if (!this.requireConfig("xmlrpc")) {
+        return;
+      }
 
-      this.getRate("throttle.global_down.rate")
-        .then((dl) => (this.dl = dl))
-        .catch(() => (this.error = true));
-    },
-    // Perform a call to the XML-RPC service to fetch the number of
-    // torrents.
-    fetchCount: async function () {
-      this.getCount().catch(() => (this.error = true));
+      return this.load(
+        this.getRate("throttle.global_up.rate").then((ul) => (this.ul = ul)),
+        this.getRate("throttle.global_down.rate").then((dl) => (this.dl = dl)),
+        this.getCount(),
+      );
     },
     // Fetch a numeric value from the XML-RPC service by requesting
     // the specified method name and parsing the XML. The response
@@ -148,16 +104,3 @@ export default {
   },
 };
 </script>
-
-<style scoped lang="scss">
-.error {
-  color: #e51111 !important;
-}
-.down {
-  margin-right: 1em;
-}
-.count {
-  color: var(--text);
-  font-size: 0.8em;
-}
-</style>

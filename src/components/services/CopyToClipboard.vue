@@ -1,31 +1,24 @@
 <template>
   <Generic :item="item">
-    <template #indicator>
-      <div class="status">
-        <i
-          class="fa-regular fa-copy fa-xl"
-          :class="{ scale: animate }"
-          @click="copy()"
-          @animationend="animate = false"
-        ></i>
-      </div>
+    <template #aside>
+      <button
+        type="button"
+        title="Copy to clipboard"
+        @click="copy()"
+        @animationend="animate = false"
+      >
+        <i class="fa-regular fa-copy fa-xl" :class="{ scale: animate }"></i>
+      </button>
     </template>
   </Generic>
 </template>
 
 <script>
 import service from "@/mixins/service.js";
-import Generic from "./Generic.vue";
 
 export default {
   name: "CopyToClipboard",
   mixins: [service],
-  props: {
-    item: Object,
-  },
-  components: {
-    Generic,
-  },
   data: () => ({
     animate: false,
   }),
@@ -39,14 +32,22 @@ export default {
 </script>
 
 <style scoped lang="scss">
+button {
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: inherit;
+}
+
 .scale {
   -webkit-animation: scale-up 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
   animation: scale-up 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
 }
-.is-light i {
+.light i {
   color: black;
 }
-.is-dark i {
+.dark i {
   color: white;
 }
 /**

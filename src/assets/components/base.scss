@@ -1,0 +1,587 @@
+@import url("~/@fortawesome/fontawesome-free/css/all.css") layer(base);
+@import url("@/assets/components/status.scss") layer(base);
+@import url("@/assets/components/badges.scss") layer(base);
+@import url("@/assets/webfonts/webfonts.scss") layer(base);
+
+@mixin ellipsis() {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@layer base {
+  html,
+  body,
+  body #app-mount,
+  body #app {
+    height: 100%;
+    background-color: var(--background);
+  }
+
+  body {
+    font-family: "Noto Sans", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+    font-variation-settings: "wdth" 100;
+
+    #app {
+      --card-height: 85px;
+      --card-icon-size: 48px;
+      --card-pad: 1.3rem;
+      --card-pad-block: 0.75rem;
+      --card-radius: 0.75rem;
+      --card-lift: 3px;
+
+      height: auto;
+      min-height: 100%;
+      background-image: var(--background-image);
+      background-size: cover;
+      background-position: center;
+      color: var(--text);
+      transition: background-color cubic-bezier(0.165, 0.84, 0.44, 1) 300ms;
+
+      a {
+        color: var(--link);
+        &:hover {
+          color: var(--link-hover);
+        }
+      }
+
+      .title {
+        font-weight: 500;
+        color: var(--text-title);
+      }
+      .subtitle {
+        color: var(--text-subtitle);
+      }
+
+      .card {
+        background-color: var(--card-background);
+        box-shadow: 0 2px 15px 0 var(--card-shadow);
+      }
+
+      .component-error .card {
+        border: 1px solid rgba(255, 33, 33, 0.664);
+        background-color: rgba(255, 58, 58, 0.24);
+      }
+
+      .message {
+        .message-body {
+          color: var(--text);
+          background-color: var(--card-background);
+        }
+      }
+
+      .footer {
+        background-color: var(--card-background);
+        box-shadow: 0 2px 15px 0 var(--card-shadow);
+      }
+    }
+
+    h1 {
+      font-size: 2rem;
+    }
+
+    h2 {
+      font-size: 1.3rem;
+      margin-top: 1.2rem;
+      margin-bottom: 0.5rem;
+
+      .fas,
+      .fab,
+      .far {
+        font-size: 1.4rem;
+        margin-right: 10px;
+      }
+
+      span {
+        font-weight: bold;
+        color: var(--highlight-secondary);
+      }
+    }
+
+    [v-cloak] {
+      display: none;
+    }
+
+    #bighead {
+      color: var(--text-header);
+
+      .dashboard-title {
+        padding-top: 6px;
+      }
+
+      .first-line {
+        min-height: 100px;
+        vertical-align: center;
+        background-color: var(--highlight-primary);
+
+        h1 {
+          margin-top: -12px;
+          font-size: 2rem;
+        }
+
+        .headline {
+          margin-top: 5px;
+          font-size: 0.9rem;
+        }
+
+        .container {
+          min-height: 80px;
+          padding: 10px 0;
+        }
+
+        .logo {
+          float: left;
+          i {
+            vertical-align: top;
+            padding: 8px 15px;
+            font-size: 50px;
+          }
+
+          img {
+            padding: 10px;
+            max-height: 70px;
+            max-width: 70px;
+          }
+        }
+      }
+      .navbar {
+        background-color: var(--highlight-secondary);
+
+        a {
+          color: var(--text-header);
+          padding: 8px 12px;
+          &:hover,
+          &:focus {
+            color: var(--text-header);
+            background-color: var(--highlight-hover);
+          }
+        }
+        .navbar-menu {
+          background-color: inherit;
+        }
+      }
+      .navbar-end {
+        text-align: right;
+      }
+    }
+
+    #main-section {
+      padding: 0 0 2.5rem 0;
+
+      h2 {
+        padding-bottom: 0px;
+        @include ellipsis();
+        i {
+          color: var(--highlight-primary);
+        }
+      }
+
+      .title {
+        font-size: 1.1em;
+        line-height: 1.3em;
+        font-weight: 500;
+        margin-bottom: 3px;
+        @include ellipsis();
+      }
+
+      .subtitle {
+        font-size: 0.9em;
+        font-weight: 300;
+        @include ellipsis();
+      }
+
+      .container {
+        padding: 1.2rem 0.75rem;
+      }
+
+      .message {
+        margin-top: 45px;
+        box-shadow: 0 2px 15px 0 rgba(0, 0, 0, 0.1);
+
+        .message-header {
+          font-weight: bold;
+        }
+
+        .message-body {
+          border: none;
+        }
+      }
+
+      .card {
+        border: none;
+        border-radius: var(--card-radius);
+        box-shadow: 0 2px 15px 0 rgba(0, 0, 0, 0.1);
+        transition:
+          transform 300ms cubic-bezier(0.165, 0.84, 0.44, 1),
+          border-color 300ms cubic-bezier(0.165, 0.84, 0.44, 1);
+        overflow: visible;
+      }
+
+      // Stacking context, or hover flip-flops between adjacent cards.
+      .card-wrapper {
+        position: relative;
+        z-index: 0;
+      }
+
+      .card-wrapper:hover {
+        .card {
+          transform: translateY(calc(-1 * var(--card-lift)));
+        }
+
+        .card-badges .badge,
+        .tag {
+          pointer-events: auto;
+        }
+
+        .tag {
+          max-width: 100%;
+          padding: 0 0.75em;
+
+          .tag-text {
+            opacity: 1;
+          }
+        }
+
+        .tag-slot:hover .tag {
+          z-index: 4;
+          max-width: max-content;
+        }
+      }
+
+      .card-content {
+        --card-text-start: var(--card-pad);
+
+        position: relative;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        grid-template-rows: auto minmax(0, 1fr);
+        grid-template-areas:
+          "body badges"
+          "body aside";
+        align-items: center;
+        column-gap: 0.5rem;
+        row-gap: 2px;
+        height: var(--card-height);
+        padding: var(--card-pad-block) var(--card-pad);
+        padding-inline-start: var(--card-text-start);
+        border-radius: inherit;
+        color: var(--link);
+
+        &.has-icon {
+          --card-text-start: calc(
+            var(--card-pad) + var(--card-icon-size) + 0.5rem
+          );
+        }
+
+        &.has-lane {
+          --card-pad-block: 0.5rem;
+          grid-template-rows: auto minmax(0, 1fr) auto;
+          grid-template-areas:
+            "body badges"
+            "body aside"
+            "lane lane";
+          row-gap: 0;
+        }
+      }
+
+      .card-wrapper:hover .card-content {
+        color: var(--link-hover);
+      }
+
+      .card-link {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        border-radius: inherit;
+
+        &:not([href]),
+        &[href=""] {
+          pointer-events: none;
+          cursor: default;
+        }
+
+        &:focus-visible {
+          outline: 2px solid var(--highlight-secondary);
+          outline-offset: -2px;
+        }
+      }
+
+      // Lifts real controls above the `.card-link` overlay. Not the tag: it
+      // keeps `z-index: 2` so an unfurled tag passes under the badges.
+      .card-content :is(a, button, select, input):not(.card-link, .tag) {
+        position: relative;
+        z-index: 3;
+      }
+
+      .card-icon {
+        position: absolute;
+        inset-inline-start: var(--card-pad);
+        inset-block-start: var(--card-pad);
+        width: var(--card-icon-size);
+        height: var(--card-icon-size);
+
+        .image {
+          display: flex;
+          align-items: center;
+          width: 100%;
+          height: 100%;
+        }
+
+        img {
+          max-height: 100%;
+          object-fit: contain;
+        }
+
+        i {
+          font-size: calc(var(--card-icon-size) * 0.667);
+        }
+      }
+
+      .card-body {
+        grid-area: body;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 2px;
+
+        > .title,
+        > .subtitle {
+          margin: 0;
+        }
+      }
+
+      .card-aside {
+        grid-area: aside;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        justify-self: end;
+      }
+
+      .card-lane {
+        grid-area: lane;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        min-width: 0;
+        min-height: 1.25rem;
+        margin-inline-start: calc(-1 * var(--card-text-start));
+        margin-inline-end: calc(-1 * var(--card-pad) - 0.2rem);
+        padding-inline-start: var(--card-text-start);
+        overflow: hidden;
+        pointer-events: none;
+      }
+
+      .card-content:not(.has-lane) .card-lane {
+        position: absolute;
+        inset-inline: 0 -0.2rem;
+        inset-block-end: var(--card-pad-block);
+        margin-inline: 0;
+        padding-inline-start: 0;
+      }
+
+      .tag-slot {
+        position: relative;
+        flex: 1 1 0;
+        min-width: 2rem;
+        // Anchors the tag to the lane's bottom, not its moving centre.
+        align-self: stretch;
+      }
+
+      .quicklinks {
+        display: flex;
+        min-width: 0;
+        gap: 0.35rem;
+        max-width: calc(100% - var(--card-pad));
+
+        a {
+          pointer-events: auto;
+          min-width: 0;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          font-size: 0.75rem;
+          line-height: 1.35;
+          padding: 1px 7px;
+          border-radius: 100px;
+          background-color: var(--background);
+        }
+      }
+
+      .card-badges {
+        grid-area: badges;
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+        justify-self: end;
+        align-self: start;
+        position: relative;
+        z-index: 3;
+        pointer-events: none;
+        margin-inline-end: calc(0.5rem - var(--card-pad));
+
+        .badge {
+          // Not in badges.scss: `#app a` outranks it there.
+          color: var(--badge-text);
+          text-decoration: none;
+
+          &:hover {
+            color: var(--badge-text);
+          }
+        }
+      }
+
+      .tag {
+        position: absolute;
+        z-index: 2;
+        inset-inline-end: 0;
+        inset-block-end: 0;
+        height: 1.25rem;
+        width: max-content;
+        max-width: 3px;
+        border-radius: 0.3125rem;
+        padding: 0;
+        overflow: hidden;
+        color: #ffffff;
+        // Collapsed, it is a sliver in the gutter between two cards.
+        pointer-events: none;
+        transition: padding 0.12s ease-out;
+
+        &:hover {
+          color: #ffffff;
+        }
+
+        &:not([class*="is-"]) {
+          background-color: var(--highlight-secondary);
+        }
+
+        .tag-text {
+          opacity: 0;
+          min-width: 0;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          transition: opacity 0.1s ease-out;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .card,
+        .tag,
+        .tag .tag-text {
+          transition: none;
+        }
+
+        .card-wrapper:hover .card {
+          transform: none;
+        }
+      }
+
+      .layout-vertical {
+        h2.group-title {
+          padding-bottom: 0.75rem;
+        }
+
+        .card {
+          border-radius: 0;
+        }
+
+        .column > div:first-of-type .card {
+          border-top-left-radius: var(--card-radius);
+          border-top-right-radius: var(--card-radius);
+        }
+
+        .column > div:last-child .card {
+          border-bottom-left-radius: var(--card-radius);
+          border-bottom-right-radius: var(--card-radius);
+        }
+      }
+    }
+
+    .footer {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 0.5rem;
+      text-align: left;
+      color: #676767;
+      font-size: 0.85rem;
+      transition: background-color cubic-bezier(0.165, 0.84, 0.44, 1) 300ms;
+    }
+
+    .no-footer {
+      #main-section {
+        padding-bottom: 0;
+      }
+
+      .footer {
+        display: none;
+      }
+    }
+
+    .search-bar {
+      position: relative;
+      display: inline-block;
+      input {
+        border: none;
+        background-color: var(--highlight-hover);
+        border-radius: 5px;
+        margin-top: 2px;
+        padding: 2px 12px 2px 30px;
+        transition: all 100ms linear;
+        color: #ffffff;
+        height: 30px;
+        width: 100px;
+
+        &:focus {
+          color: #000000;
+          width: 250px;
+          background-color: #ffffff;
+        }
+      }
+
+      .search-label::before {
+        font-family: "Font Awesome 7 Free";
+        position: absolute;
+        top: 14px;
+        left: 16px;
+        content: "\f002";
+        font-weight: 900;
+        width: 20px;
+        height: 20px;
+        color: #ffffff;
+      }
+
+      &:focus-within .search-label::before {
+        color: #6e6e6e;
+      }
+    }
+
+    .offline-message {
+      text-align: center;
+      margin: 35px 0;
+
+      i {
+        font-size: 2rem;
+      }
+
+      i.fa-redo-alt {
+        font-size: 1.3rem;
+        line-height: 1rem;
+        vertical-align: middle;
+        cursor: pointer;
+        color: #3273dc;
+      }
+    }
+  }
+
+  .group-logo {
+    float: left;
+    margin-inline-end: 0.5rem;
+  }
+}

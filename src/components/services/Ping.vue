@@ -1,34 +1,27 @@
 <template>
-  <Generic :item="item">
-    <template #indicator>
-      <div v-if="status" class="status" :class="status">
-        {{ status }}
-      </div>
-    </template>
-  </Generic>
+  <Generic :item="item" :subtitle="rttLabel" :status="reachabilityStatus()" />
 </template>
 
 <script>
 import service from "@/mixins/service.js";
-import Generic from "./Generic.vue";
 
 export default {
   name: "Ping",
   mixins: [service],
-  props: {
-    item: Object,
-  },
-  components: {
-    Generic,
-  },
   data: () => ({
-    status: null,
+    serverError: null,
+    rtt: null,
   }),
-  created() {
-    this.fetchStatus();
+  computed: {
+    rttLabel: function () {
+      if (this.serverError === null) {
+        return null;
+      }
+      return !this.serverError ? `${this.rtt}ms` : "unavailable";
+    },
   },
   methods: {
-    fetchStatus: async function () {
+    fetchData: async function () {
       const method =
         typeof this.item.method === "string"
           ? this.item.method.toUpperCase()
@@ -39,45 +32,25 @@ export default {
         return;
       }
 
-      this.fetch("/", { method, cache: "no-cache" }, false)
+      const startTime = performance.now();
+      const timeout = parseInt(this.item.timeout, 10) || 2000;
+      const params = {
+        method,
+        cache: "no-cache",
+        signal: AbortSignal.timeout(timeout),
+      };
+
+      this.fetch("/", params, false)
         .then(() => {
-          this.status = "online";
+          this.serverError = false;
+          const endTime = performance.now();
+          this.rtt = Math.round(endTime - startTime);
         })
         .catch(() => {
-          this.status = "offline";
+          this.serverError = true;
+          this.rtt = null; // Reset rtt on failure
         });
     },
   },
 };
 </script>
-
-<style scoped lang="scss">
-.status {
-  font-size: 0.8rem;
-  color: var(--text-title);
-  white-space: nowrap;
-  margin-left: 0.25rem;
-
-  &.online:before {
-    background-color: #94e185;
-    border-color: #78d965;
-    box-shadow: 0 0 5px 1px #94e185;
-  }
-
-  &.offline:before {
-    background-color: #c9404d;
-    border-color: #c42c3b;
-    box-shadow: 0 0 5px 1px #c9404d;
-  }
-
-  &:before {
-    content: " ";
-    display: inline-block;
-    width: 7px;
-    height: 7px;
-    margin-right: 10px;
-    border: 1px solid #000;
-    border-radius: 7px;
-  }
-}
-</style>

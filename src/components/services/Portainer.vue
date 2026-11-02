@@ -1,41 +1,23 @@
 <template>
-  <Generic :item="item">
-    <template #indicator>
-      <div class="notifs">
-        <strong v-if="running > 0" class="notif running" title="Running">
-          {{ running }}
-        </strong>
-        <strong v-if="dead > 0" class="notif dead" title="Dead">
-          {{ dead }}
-        </strong>
-        <strong
-          v-if="misc > 0"
-          class="notif misc"
-          title="Other (creating, paused, exited, etc.)"
-        >
-          {{ misc }}
-        </strong>
-      </div>
-    </template>
-  </Generic>
+  <Generic
+    :item="item"
+    :subtitle="displayVersion(versionstring)"
+    :status="reachabilityStatus()"
+    :badges="badges"
+  />
 </template>
 
 <script>
 import service from "@/mixins/service.js";
-import Generic from "./Generic.vue";
+import { displayVersion } from "@/utils/format.js";
 
 export default {
   name: "Portainer",
   mixins: [service],
-  props: {
-    item: Object,
-  },
-  components: {
-    Generic,
-  },
   data: () => ({
-    endpoints: null,
     containers: null,
+    serverError: null,
+    versionstring: null,
   }),
   computed: {
     running: function () {
@@ -65,75 +47,67 @@ export default {
         );
       }).length;
     },
-  },
-  created() {
-    this.fetchStatus();
+    badges() {
+      return [
+        {
+          key: "running",
+          label: "Running",
+          value: this.running,
+          tone: "success",
+          cap: false,
+        },
+        { key: "dead", label: "Dead", value: this.dead, tone: "danger" },
+        {
+          key: "misc",
+          label: "Other (creating, paused, exited, etc.)",
+          value: this.misc,
+          tone: "neutral",
+          cap: false,
+        },
+      ];
+    },
   },
   methods: {
-    fetchStatus: async function () {
+    displayVersion,
+    fetchData: function () {
       const headers = {
         "X-Api-Key": this.item.apikey,
       };
 
-      this.endpoints = await this.fetch("/api/endpoints", { headers }).catch(
-        (e) => {
-          console.error(e);
-        },
+      return this.load(
+        this.fetch("/api/status", { headers }).then((response) => {
+          this.versionstring = response.Version;
+        }),
+        this.fetchContainers(headers),
+      );
+    },
+    fetchContainers: async function (headers) {
+      const endpoints = await this.fetch("/api/endpoints", { headers });
+      const wanted = endpoints.filter(
+        (endpoint) =>
+          !this.item.environments ||
+          this.item.environments.includes(endpoint.Name),
       );
 
-      let containers = [];
-      for (let endpoint of this.endpoints) {
-        if (
-          this.item.environments &&
-          !this.item.environments.includes(endpoint.Name)
-        ) {
-          continue;
-        }
-        const uri = `/api/endpoints/${endpoint.Id}/docker/containers/json?all=1`;
-        const endpointContainers = await this.fetch(uri, { headers }).catch(
-          (e) => {
-            console.error(e);
-          },
-        );
+      // One dead environment must not blank the others, but still reports.
+      const results = await Promise.allSettled(
+        wanted.map((endpoint) =>
+          this.fetch(
+            `/api/endpoints/${endpoint.Id}/docker/containers/json?all=1`,
+            { headers },
+          ),
+        ),
+      );
 
-        if (endpointContainers) {
-          containers = containers.concat(endpointContainers);
-        }
+      this.containers = results
+        .filter((result) => result.status === "fulfilled")
+        .flatMap((result) => result.value);
+
+      const failed = results.find((result) => result.status === "rejected");
+      if (failed) {
+        throw failed.reason;
       }
-
-      this.containers = containers;
     },
   },
 };
 </script>
-
-<style scoped lang="scss">
-.notifs {
-  position: absolute;
-  color: white;
-  font-family: sans-serif;
-  top: 0.3em;
-  right: 0.5em;
-
-  .notif {
-    display: inline-block;
-    padding: 0.2em 0.35em;
-    border-radius: 0.25em;
-    position: relative;
-    margin-left: 0.3em;
-    font-size: 0.8em;
-
-    &.running {
-      background-color: #4fd671;
-    }
-
-    &.dead {
-      background-color: #e51111;
-    }
-
-    &.misc {
-      background-color: #2ed0c8;
-    }
-  }
-}
-</style>

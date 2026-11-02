@@ -1,42 +1,37 @@
 <template>
-  <Generic :item="item">
-    <template #content>
-      <p class="title is-4">{{ item.name }}</p>
-      <p class="subtitle is-6">
-        <template v-if="item.subtitle">
-          {{ item.subtitle }}
-        </template>
-        <template v-else-if="meal"> Today: {{ meal.name }} </template>
-        <template v-else-if="stats">
-          happily keeping {{ stats.totalRecipes }} recipes organized
-        </template>
-      </p>
-    </template>
-  </Generic>
+  <Generic :item="item" :subtitle="mealtext || statsText" :badges="badges" />
 </template>
 
 <script>
 import service from "@/mixins/service.js";
-import Generic from "./Generic.vue";
 
 export default {
   name: "Mealie",
   mixins: [service],
-  props: {
-    item: Object,
-  },
-  components: {
-    Generic,
-  },
   data: () => ({
     stats: null,
     meal: null,
+    serverError: null,
   }),
-  created() {
-    this.fetchStatus();
+  computed: {
+    badges() {
+      return [this.connectionBadge()];
+    },
+    mealtext: function () {
+      if (this.meal && this.meal.length > 0) {
+        return `Today: ${this.meal[0].recipe.name}`;
+      }
+      return null;
+    },
+    statsText: function () {
+      if (this.stats) {
+        return `Happily keeping ${this.stats.totalRecipes} recipes organized`;
+      }
+      return null;
+    },
   },
   methods: {
-    fetchStatus: async function () {
+    fetchData: async function () {
       const headers = {
         Authorization: "Bearer " + this.item.apikey,
         Accept: "application/json",
@@ -44,12 +39,17 @@ export default {
 
       if (this.item.subtitle != null) return;
 
-      this.meal = await this.fetch("/api/meal-plans/today/", { headers }).catch(
-        (e) => console.log(e),
+      return this.load(
+        this.fetch("/api/groups/mealplans/today", { headers }).then((meal) => {
+          this.meal = meal;
+        }),
+        // Admin-only, so a non-admin key must not sink the whole card.
+        this.fetch("/api/admin/about/statistics", { headers })
+          .then((stats) => {
+            this.stats = stats;
+          })
+          .catch((e) => console.warn("Mealie statistics unavailable:", e)),
       );
-      this.stats = await this.fetch("/api/debug/statistics/", {
-        headers,
-      }).catch((e) => console.log(e));
     },
   },
 };

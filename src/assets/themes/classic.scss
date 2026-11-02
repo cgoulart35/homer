@@ -1,0 +1,59 @@
+// Theme colors
+.light {
+  --highlight-primary: #3367d6;
+  --highlight-secondary: #4285f4;
+  --highlight-hover: #5a95f5;
+  --background: #f5f5f5;
+  --card-background: #ffffff;
+  --text: #363636;
+  --text-header: #ffffff;
+  --text-title: #303030;
+  --text-subtitle: #424242;
+  --card-shadow: rgba(0, 0, 0, 0.1);
+  --link: #3273dc;
+  --link-hover: #363636;
+  --background-image: none;
+
+  --highlight-variant-inverted: #363636;
+}
+
+.dark {
+  --highlight-primary: #3367d6;
+  --highlight-secondary: #4285f4;
+  --highlight-hover: #5a95f5;
+  --background: #131313;
+  --card-background: #282828;
+  --text: #eaeaea;
+  --text-header: #ffffff;
+  --text-title: #fafafa;
+  --text-subtitle: #b6b6b6;
+  --card-shadow: rgba(0, 0, 0, 0.4);
+  --link: #3273dc;
+  --link-hover: #144aa2;
+  --background-image: none;
+
+  --highlight-variant-inverted: #f5f5f5;
+}
+
+#app {
+  --highlight-blue: #444b6e;
+  --highlight-red: #c83e4d;
+  --highlight-pink: #ff6392;
+  --highlight-orange: #ff8a08;
+  --highlight-green: #22a699;
+  --highlight-purple: #711db0;
+
+  --status-online: #94e185;
+  --status-offline: #d65c68;
+  --status-warning: #e8bb7d;
+  --status-busy: #8fe87d;
+  --status-unknown: #9a9a9a;
+
+  --badge-text: #ffffff;
+  --badge-info: #4fb5d6;
+  --badge-success: #2ac194;
+  --badge-warning: #d08d2e;
+  --badge-danger: #d6455d;
+  --badge-accent: #8a3ffc;
+  --badge-neutral: #6b7280;
+}

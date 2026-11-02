@@ -1,108 +1,72 @@
 <template>
-  <Generic :item="item">
-    <template #indicator>
-      <div class="notifs">
-        <strong class="notif total" title="Total Devices">
-          {{ total }}
-        </strong>
-        <strong class="notif connected" title="Connected Devices">
-          {{ connected }}
-        </strong>
-        <strong class="notif newdevices" title="New Devices">
-          {{ newdevices }}
-        </strong>
-        <strong class="notif alert" title="Down Alerts">
-          {{ downalert }}
-        </strong>
-        <strong
-          v-if="serverError"
-          class="notif alert"
-          title="Connection error to PiAlert server, check the url in config.yml"
-          >?</strong
-        >
-      </div>
-    </template>
-  </Generic>
+  <Generic :item="item" :badges="badges" />
 </template>
 
 <script>
 import service from "@/mixins/service.js";
-import Generic from "./Generic.vue";
 
 export default {
   name: "PiAlert",
   mixins: [service],
-  props: {
-    item: Object,
-  },
-  components: {
-    Generic,
-  },
   data: () => {
     return {
       total: 0,
       connected: 0,
       newdevices: 0,
       downalert: 0,
-      serverError: false,
+      serverError: null,
     };
   },
-  created() {
-    const updateInterval = parseInt(this.item.updateInterval, 10) || 0;
-    if (updateInterval > 0) {
-      setInterval(() => this.fetchStatus(), updateInterval);
-    }
-    this.fetchStatus();
+  computed: {
+    badges() {
+      return [
+        {
+          key: "total",
+          label: "Total Devices",
+          value: this.total,
+          tone: "neutral",
+          showZero: true,
+          cap: false,
+        },
+        {
+          key: "connected",
+          label: "Connected Devices",
+          value: this.connected,
+          tone: "success",
+          showZero: true,
+          cap: false,
+        },
+        {
+          key: "newdevices",
+          label: "New Devices",
+          value: this.newdevices,
+          tone: "info",
+          showZero: true,
+        },
+        {
+          key: "downalert",
+          label: "Down Alerts",
+          value: this.downalert,
+          tone: "danger",
+          showZero: true,
+        },
+        this.connectionBadge(),
+      ];
+    },
   },
   methods: {
-    fetchStatus: async function () {
-      this.fetch("/php/server/devices.php?action=getDevicesTotals")
-        .then((response) => {
-          this.total = response[0];
-          this.connected = response[1];
-          this.newdevices = response[3];
-          this.downalert = response[4];
-        })
-        .catch((e) => {
-          console.log(e);
-          this.serverError = true;
-        });
+    fetchData: async function () {
+      return this.load(
+        this.fetch("/php/server/devices.php?action=getDevicesTotals").then(
+          (response) => {
+            this.total = response[0];
+            this.connected = response[1];
+            this.newdevices = response[3];
+            this.downalert = response[4];
+          },
+        ),
+      );
     },
   },
 };
 </script>
-
-<style scoped lang="scss">
-.notifs {
-  position: absolute;
-  color: white;
-  font-family: sans-serif;
-  top: 0.3em;
-  right: 0.5em;
-
-  .notif {
-    display: inline-block;
-    padding: 0.2em 0.35em;
-    border-radius: 0.25em;
-    position: relative;
-    margin-left: 0.3em;
-    font-size: 0.8em;
-
-    &.total {
-      background-color: #4fb5d6;
-    }
-
-    &.connected {
-      background-color: #4fd671;
-    }
-
-    &.newdevices {
-      background-color: #d08d2e;
-    }
-
-    &.alert {
-      background-color: #e51111;
-    }
-  }
-}
-</style>

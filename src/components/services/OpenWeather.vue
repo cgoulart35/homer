@@ -1,44 +1,25 @@
 <template>
-  <div>
-    <div class="card" :class="item.class">
-      <a
-        :href="`https://openweathermap.org/city/${id}`"
-        :target="item.target"
-        rel="noreferrer"
-      >
-        <div class="card-content">
-          <div class="media">
-            <div v-if="icon" class="media-left" :class="item.background">
-              <figure class="image is-48x48">
-                <img
-                  :src="`https://openweathermap.org/img/wn/${icon}@2x.png`"
-                  :alt="conditions"
-                  :title="conditions"
-                />
-              </figure>
-            </div>
-            <div class="media-content">
-              <p v-if="error" class="error">Data could not be retrieved</p>
-              <div v-else>
-                <p class="title is-4">{{ name }}</p>
-                <p class="subtitle is-6">
-                  <span>
-                    {{ temperature }}
-                  </span>
-                  <span class="location-time">
-                    {{ locationTime }}
-                  </span>
-                </p>
-              </div>
-            </div>
-          </div>
-          <div class="tag" :class="item.tagstyle" v-if="item.tag">
-            <strong class="tag-text">#{{ item.tag }}</strong>
-          </div>
-        </div>
-      </a>
-    </div>
-  </div>
+  <Generic :item="weatherItem" :class="{ 'component-error': error }">
+    <template v-if="icon" #icon>
+      <div class="card-icon" :class="item.background">
+        <figure class="image">
+          <img
+            :src="`https://openweathermap.org/img/wn/${icon}@2x.png`"
+            :alt="conditions"
+            :title="conditions"
+          />
+        </figure>
+      </div>
+    </template>
+    <template #subtitle>
+      <template v-if="error">Fail to load weather information</template>
+      <template v-else>
+        <span>{{ temperature }}</span>
+        <span class="location-time">{{ locationTime }}</span>
+      </template>
+    </template>
+    <template v-if="error" #aside>⚠️</template>
+  </Generic>
 </template>
 
 <script>
@@ -57,6 +38,13 @@ export default {
     timezoneOffset: 0,
   }),
   computed: {
+    weatherItem: function () {
+      const item = { ...this.item };
+      delete item.background;
+      item.name = this.name ?? this.item.name;
+      item.url = this.id ? `https://openweathermap.org/city/${this.id}` : "";
+      return item;
+    },
     temperature: function () {
       if (!this.temp) return "";
 
@@ -108,7 +96,8 @@ export default {
           this.timezoneOffset = weather.timezone;
         })
         .catch((e) => {
-          console.log(e);
+          console.error(e);
+          this.name = this.item.name;
           this.error = true;
         });
     },
@@ -129,7 +118,7 @@ export default {
 <style scoped lang="scss">
 // Add a border around the weather image.
 // Otherwise the image is not always distinguishable.
-.media-left {
+.card-icon {
   &.circle,
   &.square {
     background-color: #e4e4e4;
@@ -138,23 +127,12 @@ export default {
   &.circle {
     border-radius: 90%;
   }
-
-  img {
-    max-height: 100%;
-  }
 }
 
-.error {
-  color: #de0000;
-}
-
-// Change background color in dark mode.
-.is-dark {
-  .media-left {
-    &.circle,
-    &.square {
-      background-color: #909090;
-    }
+.dark .card-icon {
+  &.circle,
+  &.square {
+    background-color: #909090;
   }
 }
 

@@ -1,99 +1,61 @@
 <template>
-  <Generic :item="item">
-    <template #indicator>
-      <div class="notifs">
-        <strong
-          v-if="downloads > 0"
-          class="notif downloading"
-          :title="`${downloads} active download${downloads > 1 ? 's' : ''}`"
-        >
-          {{ downloads }}
-        </strong>
-        <i
-          v-if="error"
-          class="notif error fa-solid fa-triangle-exclamation"
-          title="Unable to fetch current status"
-        ></i>
-      </div>
+  <Generic :item="item" :badges="badges">
+    <template #subtitle>
+      <span class="is-family-monospace">
+        <i class="fas fa-download"></i>
+        {{ downRate }}
+      </span>
     </template>
   </Generic>
 </template>
 
 <script>
 import service from "@/mixins/service.js";
-import Generic from "./Generic.vue";
+import { displayRate } from "@/utils/format.js";
 
 export default {
   name: "SABnzbd",
   mixins: [service],
-  props: {
-    item: Object,
-  },
-  components: {
-    Generic,
-  },
   data: () => ({
     stats: null,
-    error: false,
+    serverError: null,
+    dlSpeed: null,
+    ulSpeed: null,
   }),
   computed: {
-    downloads: function () {
+    downloads() {
       if (!this.stats) {
         return "";
       }
       return this.stats.noofslots;
     },
-  },
-  created() {
-    const downloadInterval = parseInt(this.item.downloadInterval, 10) || 0;
-    if (downloadInterval > 0) {
-      setInterval(() => this.fetchStatus(), downloadInterval);
-    }
-
-    this.fetchStatus();
+    downRate() {
+      return displayRate(this.dlSpeed);
+    },
+    badges() {
+      return [
+        {
+          key: "downloads",
+          label: "Active downloads",
+          value: this.downloads,
+          tone: "info",
+        },
+        this.connectionBadge(),
+      ];
+    },
   },
   methods: {
-    fetchStatus: async function () {
-      try {
-        const response = await this.fetch(
+    fetchData: function () {
+      return this.load(
+        this.fetch(
           `/api?output=json&apikey=${this.item.apikey}&mode=queue`,
-        );
-        this.error = false;
-        this.stats = response.queue;
-      } catch (e) {
-        this.error = true;
-        console.error(e);
-      }
+        ).then((response) => {
+          this.stats = response.queue;
+          // `speed` carries a unit suffix ("512 K"); kbpersec is the number.
+          this.dlSpeed = parseFloat(response.queue.kbpersec) * 1000;
+        }),
+      );
     },
   },
 };
 </script>
-
-<style scoped lang="scss">
-.notifs {
-  position: absolute;
-  color: white;
-  font-family: sans-serif;
-  top: 0.3em;
-  right: 0.5em;
-
-  .notif {
-    display: inline-block;
-    padding: 0.2em 0.35em;
-    border-radius: 0.25em;
-    position: relative;
-    margin-left: 0.3em;
-    font-size: 0.8em;
-
-    &.downloading {
-      background-color: #4fb5d6;
-    }
-
-    &.error {
-      border-radius: 50%;
-      aspect-ratio: 1;
-      background-color: #e51111;
-    }
-  }
-}
-</style>
