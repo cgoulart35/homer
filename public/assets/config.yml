@@ -121,4 +121,4 @@ services:
         logo: "assets/personal/Patreon.png"
         subtitle: "Subscribe to GBot or other projects!"
         tag: "link"
-        url: "https://www.patreon.com/StormerG"
+        url: "https://www.patreon.com/StormerG/membership"
