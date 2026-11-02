@@ -69,7 +69,7 @@ services:
         tag: "claude-code-plugin"
         url: "https://github.com/cgoulart35/Promptcraft"
       - name: "GBot"
-        logo: "assets/personal/GBot.jpg"
+        logo: "assets/personal/GBot.jpg?v=2"
         subtitle: "A Dockerized Python Discord bot, for fun!"
         tag: "discord-bot"
         url: "https://gbot.stormerg.com/"
